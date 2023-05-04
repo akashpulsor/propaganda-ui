@@ -7,15 +7,17 @@ import {
   TextInput,
   TouchableOpacity,
   Platform,
-  StyleSheet
+  StyleSheet,Alert
 } from 'react-native';
 
 import * as Animatable from 'react-native-animatable';
 import { LinearGradient } from 'expo-linear-gradient';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Feather from 'react-native-vector-icons/Feather';
-
 import GlobalStyle from '../config/GlobalStyle';
+import { useDispatch } from 'react-redux';
+import { Register } from '../store/actions/actions';
+import { REGISTER_EXCEPTION } from '../config/constants';
 
 
 
@@ -23,6 +25,8 @@ import GlobalStyle from '../config/GlobalStyle';
 
 const RegisterScreen = ({navigation}) => {
   const [data, setData] = React.useState({
+    email: '',
+    phone: '',
     username: '',
     password: '',
     confirm_password: '',
@@ -30,7 +34,8 @@ const RegisterScreen = ({navigation}) => {
     secureTextEntry: true,
     confirm_secureTextEntry: true,
 });
-const { signIn } = React.useContext(AuthContext);
+
+const dispatch = useDispatch();
 const textInputChange = (val) => {
     if( val.length !== 0 ) {
         setData({
@@ -50,7 +55,24 @@ const textInputChange = (val) => {
 const handlePasswordChange = (val) => {
     setData({
         ...data,
-        password: val
+        password: val,
+        
+    });
+}
+
+const handleEmailChange = (val) => {
+    setData({
+        ...data,
+        email: val,
+        check_textInputChange: validateEmail(val)
+    });
+}
+
+const handlePhoneChange = (val) => {
+    setData({
+        ...data,
+        phone: val,
+        check_textInputChange: phonenumber(val)
     });
 }
 
@@ -68,6 +90,30 @@ const updateSecureTextEntry = () => {
     });
 }
 
+function phonenumber(phoneno)
+{
+  var phonenoRegEx = /^\d{10}$/;
+  if(phonenoRegEx.test(phoneno))
+    {
+      return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+function validateEmail(input) {
+    let validRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+    if (validRegex.test(input)) { 
+      return true;
+  
+    } else {
+      return false;
+  
+    }
+}
+
 const updateConfirmSecureTextEntry = () => {
     setData({
         ...data,
@@ -76,10 +122,6 @@ const updateConfirmSecureTextEntry = () => {
 }
 
 const registerHandle = (data) => {
-
-  //      const foundUser = Users.filter( item => {
-    //        return userName == item.username && password == item.password;
-     //   } );
         if(data.password != data.confirm_password){
           Alert.alert('Password and confirm password mismatched', [
             {text: 'Okay'}
@@ -93,12 +135,7 @@ const registerHandle = (data) => {
             return;
         }
   
-        if ( foundUser.length == 0 ) {
-            Alert.alert('Invalid User!', 'Username or password is incorrect.', [
-                {text: 'Okay'}
-            ]);
-            return;
-        }
+
 
         if ( data.password.length == 0 || data.password.length == 0 ) {
           Alert.alert('Wrong Input!', 'Username or password field cannot be empty.', [
@@ -106,7 +143,7 @@ const registerHandle = (data) => {
           ]);
           return;
       }
-        signIn(foundUser);
+      dispatch(Register(data, REGISTER_EXCEPTION));
     }
   return (
     <View style={styles.container}>
@@ -118,7 +155,33 @@ const registerHandle = (data) => {
       style={styles.footer}
   >
       <ScrollView>
-      <Text style={styles.text_footer}>Username</Text>
+            <Text style={styles.text_footer}>Username</Text>
+      <View style={styles.action}>
+            <FontAwesome 
+                name="user-o"
+                color="#05375a"
+                size={20}
+            />
+            <TextInput 
+                placeholder="Your Username"
+                style={styles.textInput}
+                autoCapitalize="none"
+                onChangeText={(val) => textInputChange(val)}
+            />
+          {data.check_textInputChange ? 
+          <Animatable.View
+              animation="bounceIn"
+          >
+              <Feather 
+                  name="check-circle"
+                  color="green"
+                  size={20}
+              />
+          </Animatable.View>
+          : null}
+      </View>
+
+      <Text style={styles.text_footer}>Email</Text>
       <View style={styles.action}>
           <FontAwesome 
               name="user-o"
@@ -126,10 +189,36 @@ const registerHandle = (data) => {
               size={20}
           />
           <TextInput 
-              placeholder="Your Username"
+              placeholder="Email"
               style={styles.textInput}
               autoCapitalize="none"
-              onChangeText={(val) => textInputChange(val)}
+              onChangeText={(val) => handleEmailChange(val)}
+          />
+          {data.check_textInputChange ? 
+          <Animatable.View
+              animation="bounceIn"
+          >
+              <Feather 
+                  name="check-circle"
+                  color="green"
+                  size={20}
+              />
+          </Animatable.View>
+          : null}
+      </View>
+
+      <Text style={styles.text_footer}>Phone</Text>
+      <View style={styles.action}>
+          <FontAwesome 
+              name="user-o"
+              color="#05375a"
+              size={20}
+          />
+          <TextInput 
+              placeholder="Email"
+              style={styles.textInput}
+              autoCapitalize="none"
+              onChangeText={(val) => handlePhoneChange(val)}
           />
           {data.check_textInputChange ? 
           <Animatable.View
@@ -224,7 +313,7 @@ const registerHandle = (data) => {
       <View style={styles.button}>
           <TouchableOpacity
               style={styles.signIn}
-              onPress={() => {}}
+              onPress={() => {{registerHandle(data)}}}
           >
           <LinearGradient
               colors={['#FFA07A', '#FF6347']}

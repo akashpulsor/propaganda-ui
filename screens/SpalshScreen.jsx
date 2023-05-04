@@ -12,7 +12,7 @@ import { useTheme } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 
 import GlobalStyle from '../config/GlobalStyle';
-import { style } from '@mui/system';
+
 
 const SpalshScreen = ({navigation}) => {
   const { colors } = useTheme();

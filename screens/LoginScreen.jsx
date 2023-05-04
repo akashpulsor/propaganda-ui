@@ -15,11 +15,10 @@ import Feather from 'react-native-vector-icons/Feather';
 
 import { useTheme } from 'react-native-paper';
 
-import { AuthContext } from '../contexts/AuthContext';
-
-//import Users from '../model/Users';
-
+import { useDispatch } from 'react-redux';
+import { Login } from '../store/actions/actions';
 import GlobalStyle from '../config/GlobalStyle';
+import { LOGIN_EXCEPTION } from '../config/constants';
 
 const LoginScreen = ({navigation}) => {
   
@@ -34,7 +33,8 @@ const LoginScreen = ({navigation}) => {
 
     const { colors } = useTheme();
 
-    const { signIn } = React.useContext(AuthContext);
+    const dispatch = useDispatch();
+   
 
     const textInputChange = (val) => {
       if( val.trim().length >= 4 ) {
@@ -93,10 +93,6 @@ const LoginScreen = ({navigation}) => {
 
   const loginHandle = (userName, password) => {
 
-//      const foundUser = Users.filter( item => {
-  //        return userName == item.username && password == item.password;
-   //   } );
-
       if ( data.username.length == 0 || data.password.length == 0 ) {
           Alert.alert('Wrong Input!', 'Username or password field cannot be empty.', [
               {text: 'Okay'}
@@ -104,13 +100,12 @@ const LoginScreen = ({navigation}) => {
           return;
       }
 
-      if ( foundUser.length == 0 ) {
-          Alert.alert('Invalid User!', 'Username or password is incorrect.', [
-              {text: 'Okay'}
-          ]);
-          return;
+      let loginRequest = {
+        "username": userName,
+        "password": password
       }
-      signIn(foundUser);
+
+      dispatch(Login(loginRequest,LOGIN_EXCEPTION))
   }
   return (
     <View style={styles.container}>

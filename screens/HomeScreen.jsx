@@ -1,16 +1,139 @@
 import React from 'react';
-import { View, Text, Button } from 'react-native';
+import { View, Text, Button,StyleSheet,Platform } from 'react-native';
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import GlobalStyle from '../config/GlobalStyle';
+import { Feather } from '@expo/vector-icons';
+import FeedNavigation from '../navigation/FeedNavigation';
+import SearchScreen from './SearchScreen';
+import CameraScreen from './CameraScreen';
+import ChatScreen from './ChatScreen';
+import ProfileScreen from './ProfileScreen';
+
+import {  useSelector } from 'react-redux';  
+const Tab = createMaterialBottomTabNavigator();
 
 function HomeScreen({ navigation }) {
+  const token = useSelector( state => state.Reducers.token )  
+  const currentUserObj = JSON.parse(useSelector( state => state.Reducers.currentUser ));
+
   return (
-    <View>
-      <Text>Home Screen</Text>
-      <Button
-        title="Go to Details"
-        onPress={() => navigation.navigate('Details')}
-      />
+    <View style={styles.container}>
+        <Tab.Navigator  barStyle={{ backgroundColor: 'black' }}
+            initialRouteName="Discover">
+
+
+            <Tab.Screen name="feed" component={FeedNavigation}
+                options={{
+                    tabBarIcon: ({ color }) => (
+                        <Feather name="home" size={24} color={'white'} />
+                    )
+                }}
+            />
+            <Tab.Screen  name="Discover" component={SearchScreen}
+                options={{
+                    tabBarIcon: ({ color }) => (
+                        <Feather name="search" size={24} color={'white'} />
+                    )
+                }}
+            />
+            <Tab.Screen  name="Add" component={CameraScreen}
+                options={{
+                    tabBarIcon: ({ color }) => (
+                        <Feather name="plus-square" size={24} color={'white'} />
+                    )
+                }}
+            />
+
+            <Tab.Screen  name="Inbox" component={ChatScreen}
+                options={{
+                    tabBarIcon: ({ color }) => (
+                        <Feather name="message-square" size={24} color={'white'} />
+                    )
+                }}
+            />
+
+            <Tab.Screen  name="Me" component={ProfileScreen}
+                options={{
+                    tabBarIcon: ({ color }) => (
+                        <Feather name="user" size={24} color={'white'} />
+                    )
+                }}
+                initialParams={{ initialUserId: currentUserObj.id }}
+            />
+
+           
+
+    
+        </Tab.Navigator>
     </View>
   );
 }
 
 export default HomeScreen;
+
+
+const styles = StyleSheet.create({
+    container: {
+        ...GlobalStyle.rootFlex
+    },
+    header: {
+        flex: 1,
+        justifyContent: 'flex-end',
+        paddingHorizontal: 20,
+        paddingBottom: 50
+    },
+    footer: {
+        flex: Platform.OS === 'ios' ? 3 : 5,
+        backgroundColor: '#fff',
+        borderTopLeftRadius: 30,
+        borderTopRightRadius: 30,
+        paddingHorizontal: 20,
+        paddingVertical: 30
+    },
+    text_header: {
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: 30
+    },
+    text_footer: {
+        color: '#05375a',
+        fontSize: 18
+    },
+    action: {
+        flexDirection: 'row',
+        marginTop: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#f2f2f2',
+        paddingBottom: 5
+    },
+    textInput: {
+        flex: 1,
+        marginTop: Platform.OS === 'ios' ? 0 : -12,
+        paddingLeft: 10,
+        color: '#05375a',
+    },
+    button: {
+        alignItems: 'center',
+        marginTop: 50
+    },
+    signIn: {
+        width: '100%',
+        height: 50,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 10
+    },
+    textSign: {
+        fontSize: 18,
+        fontWeight: 'bold'
+    },
+    textPrivate: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        marginTop: 20
+    },
+    color_textPrivate: {
+        color: 'grey'
+    }
+  });
+  
